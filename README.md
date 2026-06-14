@@ -1,5 +1,11 @@
 # x-native
 
+[![CI](https://github.com/jpoindexter/x-native/actions/workflows/ci.yml/badge.svg)](https://github.com/jpoindexter/x-native/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-green.svg)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg)](https://www.typescriptlang.org/)
+[![dependencies](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg)](package.json)
+
 **Native TypeScript client for X/Twitter's GraphQL** — search, bookmarks, read tweets. Keyless **cookie auth**, **zero dependencies**, no Python, and **self-healing query IDs**.
 
 X has no open API like Reddit's `.json` — its web app talks to a locked internal GraphQL endpoint with a bearer token, a CSRF token, and **query IDs that rotate every few weeks**. Most tools offload that churn to a maintained Python CLI. `x-native` does it in TypeScript instead: it authenticates with your browser cookie and **re-scrapes the current query IDs from X's own web bundles** when they change.
