@@ -20,7 +20,7 @@ describe("extractQueryIds", () => {
 const TIMELINE = {
   data: { bookmark_timeline_v2: { timeline: { instructions: [{ entries: [
     { content: { itemContent: { tweet_results: { result: {
-      rest_id: "123", core: { user_results: { result: { legacy: { screen_name: "jane" } } } },
+      rest_id: "123", core: { user_results: { result: { core: { screen_name: "jane" } } } }, // new X shape: handle in user core
       legacy: { full_text: "invoices done manually = pain", favorite_count: 7 },
     } } } } },
     { content: { itemContent: { tweet_results: { result: { tweet: {
