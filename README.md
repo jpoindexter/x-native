@@ -61,13 +61,13 @@ Every call returns `{ ok: true, tweets } | { ok: false, error }` — errors as v
 
 `refreshQueryIds` fetches `x.com`, then crawls its client-web JS bundles **two levels deep** (a bundle can reference another bundle), extracting every `operationName → queryId` pair into a small cache (`~/.x-native/qids.json`). When X rotates an ID, re-run `x-native heal`.
 
-**What auto-heals vs. what doesn't** (the honest boundary):
-- **Search** (`SearchTimeline`) and ~150 other ops live in the top-level bundles — `heal` finds them reliably.
-- **Bookmarks** does **not** auto-heal. Its query ID lives in a per-route lazy chunk: X inlines a manifest of ~940 *opaque numeric* chunks in the HTML, but the chunk-URL construction is obfuscated, so there's no reliable way to fetch the right chunk without running X's webpack runtime (a headless browser — which this library deliberately avoids). So for `Bookmarks`, grab the ID once from DevTools and pin it:
+**The honest boundary.** `heal` scrapes ~150 `operationName → queryId` pairs from the top-level bundles (e.g. `SearchTimeline`). But X serves different bundle builds to different sessions/IPs, so a *scraped* ID can be a build behind the live API and return **`HTTP 404`**. And the lazy-loaded ones (`Bookmarks`) aren't in those bundles at all — they're in per-route chunks behind X's inlined manifest of ~940 *opaque numeric* chunks, whose URL construction is obfuscated enough that fetching the right one reliably would require running X's webpack runtime (a headless browser, which this library avoids).
 
-  > Open `x.com/i/bookmarks` → DevTools → Network → click the **`Bookmarks`** request → its URL is `…/graphql/`**`<ID>`**`/Bookmarks`. Then `export X_NATIVE_QID_BOOKMARKS=<ID>`.
+So the **reliable** way to get a working ID for any op you call is to **pin it from DevTools** — it then persists for weeks until X rotates it (you'll know: `404`):
 
-  It persists for weeks until X rotates it; you'll know it rotated when you get an `HTTP 404` (re-grab + re-set). Same pattern works for any op via `X_NATIVE_QID_<OP>`.
+> Open the page that triggers the op (e.g. `x.com/i/bookmarks`) → DevTools → Network → click the GraphQL request (e.g. **`Bookmarks`**) → its URL is `…/graphql/`**`<ID>`**`/<Op>`. Then `export X_NATIVE_QID_<OP>=<ID>` (e.g. `X_NATIVE_QID_BOOKMARKS`).
+
+`heal` is still a useful first pass + a way to refresh the bundle-scraped IDs; just treat a `404` as "pin this one from DevTools."
 
 ## Config (escape hatches)
 
