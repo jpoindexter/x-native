@@ -60,7 +60,10 @@ export async function refreshQueryIds(opts: { cookie?: string; cacheDir?: string
     found,
     qids: st.merged,
     message:
-      `crawled ${st.seen.size} bundles${opts.cookie ? " (logged-in)" : " (logged-out — pass a cookie for Bookmarks)"}; ` +
-      `have: ${have.join(", ") || "none"}` + (missing.length ? `; missing: ${missing.join(", ")}` : ""),
+      `crawled ${st.seen.size} bundles; have: ${have.join(", ") || "none"}` +
+      (missing.length
+        ? `; missing: ${missing.join(", ")} — these live in opaque lazy chunks, so pin them from DevTools: ` +
+          missing.map((op) => `X_NATIVE_QID_${op.toUpperCase()}`).join(", ")
+        : ""),
   };
 }

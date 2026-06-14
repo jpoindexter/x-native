@@ -61,8 +61,13 @@ Every call returns `{ ok: true, tweets } | { ok: false, error }` — errors as v
 
 `refreshQueryIds` fetches `x.com`, then crawls its client-web JS bundles **two levels deep** (a bundle can reference another bundle), extracting every `operationName → queryId` pair into a small cache (`~/.x-native/qids.json`). When X rotates an ID, re-run `x-native heal`.
 
-- **Search** (`SearchTimeline`) is in a top-level bundle — the heal finds it reliably, even logged-out.
-- **Bookmarks** is a **logged-in-only** route, so its query ID lives in a bundle X only serves to an authenticated session. **Pass your cookie to `heal`** so it crawls the logged-in app. If it still can't find it, grab the ID once from your browser DevTools (open `x.com/i/bookmarks` → Network → the `Bookmarks` GraphQL request URL is `…/graphql/<ID>/Bookmarks`) and set `X_NATIVE_QID_BOOKMARKS`.
+**What auto-heals vs. what doesn't** (the honest boundary):
+- **Search** (`SearchTimeline`) and ~150 other ops live in the top-level bundles — `heal` finds them reliably.
+- **Bookmarks** does **not** auto-heal. Its query ID lives in a per-route lazy chunk: X inlines a manifest of ~940 *opaque numeric* chunks in the HTML, but the chunk-URL construction is obfuscated, so there's no reliable way to fetch the right chunk without running X's webpack runtime (a headless browser — which this library deliberately avoids). So for `Bookmarks`, grab the ID once from DevTools and pin it:
+
+  > Open `x.com/i/bookmarks` → DevTools → Network → click the **`Bookmarks`** request → its URL is `…/graphql/`**`<ID>`**`/Bookmarks`. Then `export X_NATIVE_QID_BOOKMARKS=<ID>`.
+
+  It persists for weeks until X rotates it; you'll know it rotated when you get an `HTTP 404` (re-grab + re-set). Same pattern works for any op via `X_NATIVE_QID_<OP>`.
 
 ## Config (escape hatches)
 
