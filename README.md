@@ -10,7 +10,7 @@
 
 X has no open API like Reddit's `.json` — its web app talks to a locked internal GraphQL endpoint with a bearer token, a CSRF token, and **query IDs that rotate every few weeks**. Most tools offload that churn to a maintained Python CLI. `x-native` does it in TypeScript instead: it authenticates with your browser cookie and **re-scrapes the current query IDs from X's own web bundles** when they change.
 
-> ⚠️ **Honest caveat.** X is anti-bot. `x-native` uses plain `fetch`, which can't replicate Chrome's TLS fingerprint the way `curl_cffi`-based tools do — so X may rate-limit or `403` requests from some IPs/datacenters. The wiring is correct; live coverage depends on X, your cookie, and your network. Use a **dedicated/secondary account** — scripted access can get accounts flagged.
+> ⚠️ **Scope & honest caveat.** This is a single-account personal tool, **not** scraping infrastructure: no proxy layer, no IP rotation, no TLS-fingerprint spoofing, no headless browser — and none are planned. It deliberately uses plain `fetch`, which **can't** replicate Chrome's TLS fingerprint the way `curl_cffi`-based tools do, so X may rate-limit or `403` requests from some IPs/datacenters. The wiring is correct; live coverage depends on X, your cookie, and your network. Use a **dedicated/secondary account** — scripted access can get accounts flagged. If you need high-volume or anti-fingerprint access, this is the wrong tool — use a `curl_cffi`-based stack.
 
 ## Install
 
